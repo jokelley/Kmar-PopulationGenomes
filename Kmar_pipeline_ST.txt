@@ -1,0 +1,223 @@
+########################################################################
+#	ARC							
+########################################################################
+
+
+#Assembling Mitochondria
+#Trimmed reads were used to assemble mitochondria
+#Example of a configuration file for one lineage of kmar.  Each lineage needs an individual configuration file, down sample to achieve ~30x coverage of the mitochondria
+
+## Configuration options start with a single "#" and use
+## Name=value pairs
+##
+## Data Columns define samples:
+## Sample_ID:Sample_ID
+## FileName: path for fasta/fastq file
+## FileType: PE1, PE2, or SE
+## FileFormat: fasta or fastq
+# reference=/data/kelley/projects/luana_projects/kmar_lineages/mitochondrial_assembly/Kmar_KT893707_FDS08.fasta
+# numcycles=50
+# mapper=bowtie2
+# assembler=spades
+# only-assembler=False
+# nprocs=2
+# format=fastq
+# verbose=True
+# urt=True
+# map_against_reads=False
+# assemblytimeout=40
+# bowtie2_k=5
+# rip=True
+# subsample=.2
+# maskrepeats=True
+# sloppymapping=True
+# sra=False
+# workingdirectory=/scratch/luana.lins_51983
+
+Sample_ID       FileName        FileType
+BBSC_ACAGTG     /scratch/luana.lins_51983/trimmed_files/BBSC_ACAGTG_1.q33_val_1.fq      PE1
+BBSC_ACAGTG     /scratch/luana.lins_51983/trimmed_files/BBSC_ACAGTG_2.q33_val_2.fq      PE2
+
+########################################################################
+#	Annotating Mitochondria							
+########################################################################
+
+#Mitochondria were annotated with MitoAnnotator, an online freely available program.  Results were downloaded and seperated by genes.  One file was created for each gene and fasta of coding sequence for 
+#each individual was included.  13 files total. 
+
+
+
+########################################################################
+#	Aligning coding sequences							
+########################################################################
+
+#Genes were aligned using MUSCLE online version.  Output was interleaved phylip format.
+
+########################################################################
+#	Concatenating coding sequences							
+########################################################################
+
+#FASconCAT-G was used to concatenate interleaved phylip format alignments one gene after another.  The output includes a table with start and stop sites for genes and a second file with phylip 
+#interleaved concatenated sequence
+
+########################################################################
+#	Partition Finder							
+########################################################################
+
+#Input was the output from FASconCAT-G
+## ALIGNMENT FILE ##
+alignment = FcC_supermatrix.phy;
+
+## BRANCHLENGTHS: linked | unlinked ##
+branchlengths = linked;
+
+## MODELS OF EVOLUTION for PartitionFinder: all | raxml | mrbayes | beast | <list> ##
+##              for PartitionFinderProtein: all_protein | <list> ##
+models = all;
+
+
+# MODEL SELECCTION: AIC | AICc | BIC #
+model_selection = BIC;
+
+## DATA BLOCKS: see manual for how to define, each possible reading position for genes ##
+[data_blocks]
+ND3_1 = 1-349\3;
+ND3_2 = 2-349\3;
+ND3_3 = 3-349\3;
+Cox1_1 = 350-1906\3;
+Cox1_2 = 351-1906\3;
+Cox1_3 = 352-1906\3;
+Cox2_1 = 1907-2597\3;
+Cox2_2 = 1908-2597\3;
+Cox2_3 = 1909-2597\3;
+ND4_1 = 2598-3978\3;
+ND4_2 = 2599-3978\3;
+ND4_3 = 2600-3978\3;
+CytB_1 = 3979-5116\3;
+CytB_2 = 3980-5116\3;
+CytB_3 = 3981-5116\3;
+ATPase6_1 = 5117-5799\3;
+ATPase6_2 = 5118-5799\3;
+ATPase6_3 = 5119-5799\3;
+ND2_1 = 5800-6844\3;
+ND2_2 = 5801-6844\3;
+ND2_3 = 5802-6844\3;
+Cox3_1 = 6845-7629\3;
+Cox3_2 = 6846-7629\3;
+Cox3_3 = 6847-7629\3;
+ATPase8_1 = 7630-7797\3;
+ATPase8_2 = 7631-7797\3;
+ATPase8_3 = 7632-7797\3;
+ND5_1 = 7798-9642\3;
+ND5_2 = 7799-9642\3;
+ND5_3 = 7800-9642\3;
+ND4L_1 = 9643-9939\3;
+ND4L_2 = 9644-9939\3;
+ND4L_3 = 9645-9939\3;
+ND1_1 = 9940-10914\3;
+ND1_2 = 9941-10914\3;
+ND1_3 = 9942-10914\3;
+ND6_1 = 10915-11436\3;
+ND6_2 = 10916-11436\3;
+ND6_3 = 10917-11436\3;
+
+
+## SCHEMES, search: all | greedy | rcluster | hcluster | user ##
+[schemes]
+search = user;
+
+#user schemes go here if search=user. See manual for how to define.#
+
+# user schemes
+allsame = (ND3_1, ND3_2, ND3_3, Cox3_1, Cox3_2, Cox3_3, Cox1_1, Cox1_2, Cox1_3, ND4_1, ND4_2, ND4_3, CytB_1, CytB_2, CytB_3, ATPase6_1, ATPase6_2, ATPase6_3, ND2_1, ND2_2, ND2_3, ATPase8_1, ATPase8_2, ATPase8_3, Cox2_1, Cox2_2, Cox2_3, ND5_1, ND5_2, ND5_3, ND4L_1, ND4L_2, ND4L_3, ND1_1, ND1_2, ND1_3, ND6_1, ND6_2, ND6_3);
+1_2_3 = (ND3_1, Cox1_1, Cox2_1, ND4_1, CytB_1, ATPase6_1, ND2_1, Cox3_1, ATPase8_1, ND5_1, ND4L_1, ND1_1, ND6_1) (ND3_2, Cox1_2, Cox2_2, ND4_2, CytB_2, ATPase6_2, ND2_2, Cox3_2, ATPase8_2, ND5_2, ND4L_2, ND1_2, ND6_2) (ND3_3, Cox1_3, Cox2_3, ND4_3, CytB_3, ATPase6_3, ND2_3, Cox3_3, ATPase8_3, ND5_3, ND4L_3, ND1_3, ND6_3);
+12_3 = (ND3_1, ND3_2, Cox3_1, Cox3_2, Cox1_1, Cox1_2, ND4_1, ND4_2, CytB_1, CytB_2, ATPase6_1, ATPase6_2, ND2_1, ND2_2, ATPase8_1, ATPase8_2, Cox2_1, Cox2_2, ND5_1, ND5_2, ND4L_1, ND4L_2, ND1_1, ND1_2, ND6_1, ND6_2) (ND3_3, Cox3_3, Cox1_3, ND4_3, CytB_3, ATPase6_3, ND2_3, ATPase8_3, Cox2_3, ND5_3, ND4L_3, ND1_3, ND6_3);
+genes = (ND3_1, ND3_2, ND3_3) (Cox3_1, Cox3_2, Cox3_3) (Cox1_1, Cox1_2, Cox1_3) (ND4_1, ND4_2, ND4_3) (CytB_1, CytB_2, CytB_3) (ATPase6_1, ATPase6_2, ATPase6_3) (ND2_1, ND2_2, ND2_3) (ATPase8_1, ATPase8_2, ATPase8_3) (Cox2_1, Cox2_2, Cox2_3) (ND5_1, ND5_2, ND5_3) (ND4L_1, ND4L_2, ND4L_3) (ND1_1, ND1_2, ND1_3) (ND6_1, ND6_2, ND6_3);
+
+########################################################################
+#	Raxml							
+########################################################################
+
+#Configuration file includes type of data, name of gene=start-stop site found in FASconCAT-G output, see Configuration file example
+
+#Running raxml, 1000 bootstraps, configuration file specified
+
+raxmlHPC-SSE3 -m GTRGAMMA -s FcC_supermatrix.phy -n all_output -q Raxml_configure_example.txt -f a -N 1000 -x 17 -p 77
+
+########################################################################
+#	MrBayes							
+########################################################################
+
+mb -i MrBayes_example.nex  1>alignment.nex.track 2>alignment.nex.err
+
+#Input file is the output of FASconCAT-G with some additions to the start and end of the file.  See example file
+
+
+########################################################################
+#	Treemix							
+########################################################################
+
+#Treemix#
+#Creating the first tree
+
+#turn the vcf into plink format
+vcftools --vcf /data/kelley/projects/luana_projects/kmar_lineages/5.2_filtered_SNPS/2.1_missingness_all/all_JointGeno.miss.recode.vcf\
+ --plink --out withgitmo_plink
+
+#using plink without web access to find allele frequencies, --within clust file (see example in example file folder), --file input, --out output
+plink --noweb --file withgitmo_plink --freq --within withgitmo.clust --out withgitmo_afterplink
+
+#gzip for the next step
+gzip withgitmo_afterplink.frq.strat
+
+#python script to create treemix format, python input output
+python /data/kelley/projects/programs/treemix/bin/plink2treemix.py  withgitmo_afterplink.frq.strat.gz withgitmo_treemix_format.gz
+
+#-noss means no correction (use when small sample numbers per population), -m number of migrations, -i input, -o output
+treemix -noss -m 0 -root Gitmo -i withgitmo_treemix_format.gz -k 500 -o withgitmo_treemix_nomig
+
+#Bootstrapping the above tree
+treemix -noss -m 0 -root Gitmo -i /data/kelley/projects/Shawn/kmar_luana_mainfolder/try_4/6treemix/nomig/bootsrap/original_run/withgitmo_treemix_format.gz -bootstrap -k 500 -o replicate1000
+
+#Taking all output bootstraps and putting them into one txt file
+
+#defines nlines as the number of lines in the table, table includes all bootstrap files, column 1 is name, column 2 is path to unzipped file containing tree
+nlines=$(wc -l < data_table |awk '{print $1}')
+
+#starts the for loop, sets i as 1, adds 1 to i untill the line count is reached
+
+for((i=1; i<nlines; i++));do
+
+
+#sets variables equal to the columns of the table, sed -n ''$i; is the current line number, 'p' prints the line, | awk grabs just the column I want
+        sampleID=$(sed -n ''$i'p' data_table | awk '{print $1}')
+        unzipped=$(sed -n ''$i'p' data_table | awk '{print$2}')
+
+        cat bootstrap_scripts/${unzipped} | awk 'FNR == 2 {print}' >> all_trees_out
+
+done<data_table
+
+
+########################################################################
+#	Viewing Trees							
+########################################################################
+
+#Trees were viewed and manipulated in FigTree, prepared for publication in Adobe Illustrator
+
+########################################################################
+#	Collecting Stats on VCF							
+########################################################################
+
+vcf-stats /data/kelley/projects/luana_projects/kmar_lineages/5.2_filtered_SNPS/2.1_missingness_all/all_JointGeno.miss.recode.vcf > stats_out.txt
+
+########################################################################
+#	Identifying putitive impacts of SNPs							
+########################################################################
+
+#SNPeff was used to identify the impacts SNPs have
+#First a database was created for kmar following the instructions in the SNPeff manual
+
+java -jar /data/kelley/projects/programs/snpEff/snpEff.jar eff \
+-c /data/kelley/projects/programs/snpEff/snpEff.config km1.2 \
+invar_gitmo_multiallele_removed.vcf >snpeffout_rm_gitmo_inv_mul.vcf
+
